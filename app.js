@@ -49,7 +49,6 @@ io.on('connection', async function (socket) {
     })
 
 
-
     socket.on('join-room', roomName => {
         db.getRoomId(roomName).then(res => {
             // console.log(res[0].room_id)

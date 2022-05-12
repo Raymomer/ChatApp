@@ -1,6 +1,3 @@
-
-
-
 const socket = io.connect();
 const base_url = "http://localhost:3000"
 const rooms = {};
@@ -67,7 +64,6 @@ socket.on('update-messsage', payload => {
     }
 
 })
-
 
 socket.on('list-roomMessage', payload => {
     document.getElementsByClassName('msg')[0].innerHTML = ""
