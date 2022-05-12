@@ -16,7 +16,7 @@ var dbConfig = {
 
 const con = mysql.createConnection(dbConfig);
 
-async function dbTest() {
+async function dbStart() {
 
 
     let dbPromise = new Promise((resolve, reject) => {
@@ -32,7 +32,7 @@ async function dbTest() {
                         throw err;
                     }
                 }
-                console.log("Database created!");
+                // console.log("Database created!");
 
 
                 // enter chatapp database 
@@ -56,7 +56,7 @@ async function dbTest() {
                     `
                     con.query(sql, function (err, result) {
                         if (err) throw err;
-                        console.log("User's table created");
+                        // console.log("User's table created");
                     });
 
 
@@ -72,7 +72,7 @@ async function dbTest() {
 
                     con.query(sql, function (err, result) {
                         if (err) throw err;
-                        console.log("Rooms's Table created");
+                        // console.log("Rooms's Table created");
                     });
 
 
@@ -97,14 +97,14 @@ async function dbTest() {
                         ` 
                         CREATE TABLE if not exists messages (
                             room_id     varchar(20)      NOT NULL,
-                            user_id     int(20)          NOT NULL,
+                            user_id     varchar(20)      NOT NULL,
                             message     varchar(255)     NOT NULL,
                             create_at   dateTime         NOT NULL
                     )`
                     con.query(sql, function (err, result) {
 
                         if (err) throw err;
-                        console.log("CREATE MESSAGES !")
+                        // console.log("CREATE MESSAGES !")
 
                         resolve();
                     });
@@ -152,32 +152,39 @@ function addRoom(roomName, menbers) {
 function addUser(profile) {
     // function addUser() {
 
-    var createTime = setLocalTime();
-    var sql = "INSERT INTO users (account ,password, mail,create_at) VALUES ('" + profile.account + "','" + profile.password + "','" + profile.mail + "','" + createTime + "')";
+    return new Promise((resolve, reject) => {
+        var createTime = setLocalTime();
+        var sql = "INSERT INTO users (account ,password, mail,create_at) VALUES ('" + profile.account + "','" + profile.password + "','" + profile.mail + "','" + createTime + "')";
 
 
-    con.query(sql, function (err, result) {
-        if (err) throw err;
+        con.query(sql, function (err, result) {
+            if (err) throw reject();
 
-        console.log("INSERT A NEW USER => ", profile);
+            console.log("INSERT A NEW USER => ", profile);
+        })
     })
+
 
     // console.log(createTime);
 }
 
 function listUser() {
 
-    var sql = `SELECT * FROM users`
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT * FROM users`
 
-    con.query(sql, function (err, rows, fields) {
+        con.query(sql, function (err, rows, fields) {
 
-        if (err) throw err;
-        const result = Object.values(JSON.parse(JSON.stringify(rows)));
-        // console.log(result)
+            if (err) throw err;
+            const result = Object.values(JSON.parse(JSON.stringify(rows)));
+            // console.log(result)
 
-        return result
+            resolve(result)
+
+        })
 
     })
+
 
 }
 
@@ -185,10 +192,11 @@ function ckeckUserExist(user_account) {
     return new Promise((resolve, reject) => {
         var sql = "SELECT * FROM users WHERE account =  '" + user_account + "'";
 
-        con.query(sql, function (err, result) {
-            console.log(result)
+        con.query(sql, function (err, rows) {
+            var result = Object.values(JSON.parse(JSON.stringify(rows)));
             if (result.length > 0) {
-                resolve()
+
+                resolve(result)
             } else {
                 reject("Can't not found user's account.")
             }
@@ -219,24 +227,28 @@ function checkRoomExist(userId) {
 
 function addMessage(user_account, roomId, msg) {
 
-    var date = new Date();
-    var createTime = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+    return new Promise((resolve, reject) => {
+        var date = new Date();
+        var createTime = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
 
-    Promise.all([checkRoomExist(roomId), ckeckUserExist(user_account)]).then(res => {
-        console.log("CHECK DONE")
+        Promise.all([checkRoomExist(roomId), ckeckUserExist(user_account)]).then(res => {
+            console.log("CHECK DONE")
 
-        var sql = "INSERT INTO messages (room_id ,user_id ,message ,create_at) VALUES ('" + roomId + "','" + user_account + "','" + msg + "','" + createTime + "')";
+            var sql = "INSERT INTO messages (room_id ,user_id ,message ,create_at) VALUES ('" + roomId + "','" + user_account + "','" + msg + "','" + createTime + "')";
 
-        con.query(sql, function (err, result) {
-            if (err) throw err;
+            con.query(sql, function (err, result) {
+                if (err) throw err;
 
-            console.log("INSERT A MESSAGE msg =>", msg);
+                console.log("INSERT A MESSAGE msg =>", msg);
+                resolve(msg)
+            })
+
+
+        }).catch(err => {
+            console.log(err);
         })
-
-
-    }).catch(err => {
-        console.log(err);
     })
+
 
 }
 
@@ -251,20 +263,35 @@ function setLocalTime() {
 }
 
 function listRoomMsg(roomId) {
-    var sql = "SELECT * FROM messages WHERE room_id =  '" + roomId + "'";
 
-    con.query(sql, function (err, rows, fields) {
-        var result = Object.values(JSON.parse(JSON.stringify(rows)));
-        console.log(result)
+    return new Promise((resolve, reject) => {
+        var sql = "SELECT * FROM messages WHERE room_id =  '" + roomId + "'";
 
-        return result
+        con.query(sql, function (err, rows, fields) {
+            var result = Object.values(JSON.parse(JSON.stringify(rows)));
+
+            resolve(result)
+        })
+    })
+
+}
+
+function getRoomId(roomName) {
+    return new Promise((resolve, reject) => {
+        var sql = "SELECT * FROM rooms WHERE room_name = '" + roomName + "'";
+
+        con.query(sql, function (err, rows, fields) {
+            var result = Object.values(JSON.parse(JSON.stringify(rows)));
+
+            resolve(result)
+        })
     })
 }
 
 
 function init() {
 
-    dbTest().then(res => {
+    dbStart().then(res => {
         // addUser({
         //     account: "ray",
         //     password: "aa1234",
@@ -274,11 +301,17 @@ function init() {
         // listUser()
         // addMessage('ray', 'hwKwvfa59aNKmfH', "TEST123");
         // listRoomMsg('hwKwvfa59aNKmfH');
+        addRoom('巨捶瑞斯', "all")
 
     })
 
 }
 
+function test() {
+    return ("Test");
+}
 
+dbStart();
+// init()
 
-init();
+module.exports = { addRoom, addUser, listUser, addMessage, listRoomMsg, test, getRoomId, ckeckUserExist }
