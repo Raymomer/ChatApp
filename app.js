@@ -1,3 +1,4 @@
+
 const express = require('express');
 const path = require('path');
 const http = require('http');
@@ -8,7 +9,7 @@ const db = require(path.join(__dirname, 'db/db.js'))
 
 const app = express();
 const server = http.createServer(app);
-const io = socket(server);
+const io = socket(server, { cors: { origin: '*', } });
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -30,7 +31,6 @@ io.on('connection', async function (socket) {
             console.log("Deal")
             io.emit('update-user', res)
         })
-        // console.log("123");
 
 
     })
@@ -39,37 +39,52 @@ io.on('connection', async function (socket) {
     socket.on('sendMessage', payload => {
         db.addMessage(payload.account, payload.roomId, payload.message).then(res => {
             console.log(res);
-
-            io.emit('update-messsage', {
+            socket.to(payload.roomId).emit('room-message', {
                 account: payload.account,
                 roomId: payload.roomId,
-                msg: res
+                message: res,
             })
+            // io.emit('update-messsage', {
+            //     account: payload.account,
+            //     roomId: payload.roomId,
+            //     message: res
+            // })
+            
         })
     })
 
 
-    socket.on('join-room', roomName => {
-        db.getRoomId(roomName).then(res => {
-            // console.log(res[0].room_id)
-            let roomId = res[0]['room_id']
+    socket.on('join-room', async payload => {
 
-            socket.emit('take-roomId', roomId);
+        Promise.all([db.getRoomId(payload.roomName), db.ckeckUserExist(payload.account)]).then(res => {
+            let check = true;
+            res.filter(row => {
+                if (row.length == 0) check = false
+            })
 
-            socket.join(roomId)
+            let response = {
+                roomId: res[0][0].room_id,
+                account: res[1][0].account
+            }
 
-            console.log(socket.rooms)
+            socket.join(response.roomId);
 
-            db.listRoomMsg(roomId).then(rows => {
-                console.log("Message =>", rows)
-                // socket.emit('list-roomMessage', rows)
-                io.to(roomId).emit('list-roomMessage', rows)
+            socket.to(response.roomId).emit('room-welcome', {
+                roomId: response.roomId,
+                message: 'welcome',
+            })
 
+            db.listRoomMsg(response.roomId).then(res => {
+
+                response['messages'] = res
+                console.log(response)
+                socket.emit('success-join', response)
             })
 
 
-        });;
-
+        }).catch(err => {
+            console.log(err)
+        })
 
     })
 
