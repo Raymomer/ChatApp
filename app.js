@@ -21,7 +21,7 @@ server.listen(port, () => {
 
 io.on('connection', async function (socket) {
 
-    socket.on("new-user", (payload) => {
+    socket.on("new-user", payload => {
 
         console.log("Get Message")
 
@@ -44,12 +44,8 @@ io.on('connection', async function (socket) {
                 roomId: payload.roomId,
                 message: res,
             })
-            // io.emit('update-messsage', {
-            //     account: payload.account,
-            //     roomId: payload.roomId,
-            //     message: res
-            // })
-            
+
+
         })
     })
 
@@ -68,7 +64,6 @@ io.on('connection', async function (socket) {
             }
 
             socket.join(response.roomId);
-
             socket.to(response.roomId).emit('room-welcome', {
                 roomId: response.roomId,
                 message: 'welcome',
@@ -87,6 +82,12 @@ io.on('connection', async function (socket) {
         })
 
     })
+
+    socket.on("leave-room", payload => {
+
+        socket.leave(payload.roomId)
+    })
+
 
 });
 

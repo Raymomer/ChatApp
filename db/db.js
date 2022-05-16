@@ -17,119 +17,119 @@ var dbConfig = {
 
 const con = mysql.createConnection(dbConfig);
 
-// async function dbStart() {
+async function dbStart() {
 
 
-//     let dbPromise = new Promise((resolve, reject) => {
+    let dbPromise = new Promise((resolve, reject) => {
 
-//         con.connect(function (err) {
+        con.connect(function (err) {
 
-//             if (err) throw err;
-//             let sql = "CREATE DATABASE chatapp"
+            if (err) throw err;
+            let sql = "CREATE DATABASE chatapp"
 
-//             con.query(sql, (err, result) => {
-//                 if (err) {
-//                     if (err.errno != 1007) {
-//                         throw err;
-//                     }
-//                 }
-//                 // console.log("Database created!");
-
-
-//                 // enter chatapp database 
-//                 con.changeUser({
-//                     database: 'chatapp'
-//                 }, (err) => {
-//                     if (err) throw err;
+            con.query(sql, (err, result) => {
+                if (err) {
+                    if (err.errno != 1007) {
+                        throw err;
+                    }
+                }
+                // console.log("Database created!");
 
 
-//                     sql =
-//                         `
-//                         CREATE TABLE if not exists users (
-//                             id          int(20)      NOT NULL AUTO_INCREMENT PRIMARY KEY,
-//                             token       varchar(255) , 
-//                             account     varchar(255) NOT NULL, 
-//                             password    varchar(255)  NOT NULL,     
-//                             mail        varchar(255)  NOT NULL, 
-//                             create_at   timestamp,
-//                             UNIQUE KEY(account)
-//                     )
-//                     `
-//                     con.query(sql, function (err, result) {
-//                         if (err) throw err;
-//                         // console.log("User's table created");
-//                     });
+                // enter chatapp database 
+                con.changeUser({
+                    database: 'chatapp'
+                }, (err) => {
+                    if (err) throw err;
 
 
-//                     // check rooms exist
-//                     sql =
-//                         ` 
-//                         CREATE TABLE if not exists rooms (
-//                             room_id			varchar(20)     NOT NULL PRIMARY KEY,
-//                             room_name       varchar(10)     NOT NULL,
-//                             menbers 		varchar(255)    NOT NULL,
-//                             create_at       timestamp       NOT NULL
-//                     )`
-
-//                     con.query(sql, function (err, result) {
-//                         if (err) throw err;
-//                         // console.log("Rooms's Table created");
-//                     });
-
-
-//                     // Try to creat a public room
-//                     sql =
-//                         `
-//                         SELECT * FROM rooms 
-//                         `
-
-//                     con.query(sql, function (err, result, fields) {
-
-//                         if (err) throw err;
-
-//                         // auto create a public room
-//                         if (result.length == 0) {
-//                             addRoom("PUBLIC", "all")
-//                         }
-
-//                     });
-
-//                     sql =
-//                         ` 
-//                         CREATE TABLE if not exists messages (
-//                             room_id     varchar(20)      NOT NULL,
-//                             user_id     varchar(20)      NOT NULL,
-//                             message     varchar(255)     NOT NULL,
-//                             create_at   dateTime         NOT NULL
-//                     )`
-//                     con.query(sql, function (err, result) {
-
-//                         if (err) throw err;
-//                         // console.log("CREATE MESSAGES !")
-
-//                         resolve();
-//                     });
+                    sql =
+                        `
+                        CREATE TABLE if not exists users (
+                            id          int(20)      NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                            token       varchar(255) , 
+                            account     varchar(255) NOT NULL, 
+                            password    varchar(255)  NOT NULL,     
+                            mail        varchar(255)  NOT NULL, 
+                            create_at   timestamp,
+                            UNIQUE KEY(account)
+                    )
+                    `
+                    con.query(sql, function (err, result) {
+                        if (err) throw err;
+                        // console.log("User's table created");
+                    });
 
 
+                    // check rooms exist
+                    sql =
+                        ` 
+                        CREATE TABLE if not exists rooms (
+                            room_id			varchar(20)     NOT NULL PRIMARY KEY,
+                            room_name       varchar(10)     NOT NULL,
+                            menbers 		varchar(255)    NOT NULL,
+                            create_at       timestamp       NOT NULL
+                    )`
 
-//                 })
+                    con.query(sql, function (err, result) {
+                        if (err) throw err;
+                        // console.log("Rooms's Table created");
+                    });
+
+
+                    // Try to creat a public room
+                    sql =
+                        `
+                        SELECT * FROM rooms 
+                        `
+
+                    con.query(sql, function (err, result, fields) {
+
+                        if (err) throw err;
+
+                        // auto create a public room
+                        if (result.length == 0) {
+                            addRoom("PUBLIC", "all")
+                        }
+
+                    });
+
+                    sql =
+                        ` 
+                        CREATE TABLE if not exists messages (
+                            room_id     varchar(20)      NOT NULL,
+                            user_id     varchar(20)      NOT NULL,
+                            message     varchar(255)     NOT NULL,
+                            create_at   dateTime         NOT NULL
+                    )`
+                    con.query(sql, function (err, result) {
+
+                        if (err) throw err;
+                        // console.log("CREATE MESSAGES !")
+
+                        resolve();
+                    });
 
 
 
+                })
 
 
-//             });
 
 
 
-//         })
-//     })
-
-//     await dbPromise
-//     return
+            });
 
 
-// }
+
+        })
+    })
+
+    await dbPromise
+    return
+
+
+}
 
 
 function addRoom(roomName, menbers) {
@@ -298,18 +298,18 @@ function init() {
 
     dbStart().then(res => {
         // addUser({
-        //     account: "ray5",
+        //     account: "ray2",
         //     password: "aa1234",
         //     mail: "elva9007790@gmail.com"
         // })
 
         // listUser()
-        for (let i = 0; i < 5; i++) {
-            addMessage('ray1', 'LY2wFlSEbp9GNyj', "Say" + i);
-        }
+        // for (let i = 0; i < 5; i++) {
+        //     addMessage('ray1', 'LY2wFlSEbp9GNyj', "Say" + i);
+        // }
 
         // listRoomMsg('hwKwvfa59aNKmfH');
-        // addRoom('巨捶瑞斯', "all")
+        addRoom('巨捶瑞斯', "all")
 
     })
 
