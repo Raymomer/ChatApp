@@ -258,13 +258,16 @@ function checkTokenExist(token) {
         let sql = "SELECT * FROM usertoken WHERE token = '" + token + "'";
 
         con.query(sql, (err, rows, fields) => {
-            if (err) throw reject(err);
+            if (err) reject(err);
             var result = Object.values(JSON.parse(JSON.stringify(rows)));
 
-            if (result.length > 0) {
+            if (result.length <= 0) {
+                reject("Token not fonud!")
+            } else {
                 resolve(result[0].user_pid);
             }
-            resolve()
+
+
         });
     });
 }
@@ -356,6 +359,7 @@ function pk() {
 
 function sqlFormmatSet(json) {
 
+    console.log("SQLFORMSET")
     return "(" + Object.keys(json).join(",") + ") VALUES ('" + Object.values(json).join("','") + "') ";
 
 
@@ -364,5 +368,5 @@ function sqlFormmatSet(json) {
 
 
 module.exports = {
-    listMessage, addUser, updateToken, listAllUser, listUserFriend, loginUser, logoutUser, checkAccountExist, checkUserPidExist, checkTokenExist, inviteFriend, addMessage, setLocalTime, pk
+    listMessage, addUser, updateToken, listAllUser, listUserFriend, loginUser, logoutUser, checkAccountExist, checkUserPidExist, checkTokenExist, inviteFriend, addMessage, setLocalTime, pk, sqlFormmatSet
 }
