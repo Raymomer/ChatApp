@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-/// TUTUTUTUTUTTUTUTUTU
-=======
 /// update_v2
->>>>>>> update_v2
 const express = require('express');
 const path = require('path');
 const http = require('http');
